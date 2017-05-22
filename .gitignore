@@ -1,0 +1,5 @@
+/target/
+/nbproject/
+/dependency-reduced-pom.xml
+/hs_err_*.log
+*.DS_Store
