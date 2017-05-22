@@ -9,9 +9,6 @@ var DemoProvView = Backbone.View.extend({
     initialize: function () {
         _.bindAll(this, "render");
         console.log('Prov demo view initialized');
-
-        EventBus.on(EVT_PROV_WORKING, this.disableButton);
-        EventBus.on(EVT_PROV_DONE, this.enableButton);
     },
     render: function () {
         var that = this;
