@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <!--Import materialize.css-->
+
+        <title>SyMeTRIC Data Hub</title>
+        <meta charset="UTF-8">
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <style>
+
+            /*.node {
+              stroke: #fff;
+              stroke-width: 1.5px;
+            }*/
+
+            .node text {
+                /*pointer-events: none;*/
+                font: 10px sans-serif;
+            }
+
+            .link {
+                stroke: #999;
+                stroke-opacity: .6;
+                fill: none;
+            }
+
+        </style>
+
+        <!-- For Leaflet web cartography -->
+        <style media="screen" type="text/css">
+            #map { height: 300px; }
+
+            .info {
+                padding: 6px 8px;
+                /*font: 14px/16px Arial, Helvetica, sans-serif;*/
+                font: 12px Arial, Helvetica, sans-serif;
+                background: white;
+                background: rgba(255,255,255,0.8);
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border-radius: 5px;
+            }
+
+            .info h5 {
+                margin: 0 0 5px;
+                color: #777;
+            }
+
+            .legend {
+                line-height: 18px;
+                color: #555;
+            }
+
+            .legend i {
+                width: 18px;
+                height: 18px;
+                float: left;
+                margin-right: 8px;
+                opacity: 0.5;
+            }
+
+            .CodeMirror {
+                border: 1px solid #eee;
+                height: auto;
+                width: auto;
+                font-size: 8pt;
+            }
+
+            .row {
+                padding-top: 20px;
+            }
+            
+            #activation {
+                line-color: '#61bffc';
+            }
+            
+            #sendingQuery, #errorQuery, #emptyQuery, #noResult {
+                margin-top: 30px;
+            }
+            .diamond:after {
+                content: ''; position: absolute; left: -8px; top: 4px; width: 0; height: 0; border: 8px solid transparent; border-top: 10px solid #666;
+            }
+
+        </style>
+
+        <style>
+            body {
+                /* Margin bottom by footer height */
+                margin-bottom: 60px;
+            }
+            .footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                /* Set the fixed height of the footer here */
+                height: 60px;
+                background-color: #f5f5f5;
+            }
+
+            .not-active {
+                pointer-events: none;
+                cursor: default;
+            }
+        </style>
+
+        <!--<link type="text/css" rel="stylesheet" href="css/simplex.min.css" />-->
+        <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+        <link type="text/css" rel="stylesheet" href="css/simple-sidebar.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css"/>
+        <link rel="stylesheet" href="css/codemirror.css">
+
+    </head>
+
+
+
+    <body>
+        <header id="pageHeader">
+            <div class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand">SyMeTRIC data hub</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="/"><i class="icon-home icon-white"></i> Home</a></li>
+                            <!--                        <li><a href="#">Link</a></li>
+                                                    <li><a href="#">Link</a></li>
+                                                    <li><a href="#">Link</a></li>-->
+                            <li id="demoMenu" class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Demos <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li id="demo-ld-menu"><a href="#">Linked Emidemiology</a></li>
+                                    <li id="demo-sb-menu"><a href="#">Systems Biology</a></li>
+                                    <li id="demo-om-menu"><a href="#">Linked *Omics Data</a></li>
+                                    <li class="divider"></li>
+                                    <!--<li class="navbar-header">Nav header</li>-->
+                                    <li id="demo-wf-menu"><a href="#">Linked Galaxy histories</a></li>
+                                    <!--<li><a href="#">One more separated link</a></li>-->
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul id="userMenu" class="nav navbar-nav navbar-right">
+                            <li class="dropdown" id="menuLogin">
+                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">Login</a>
+                                <!--<div class="dropdown-menu" style="padding:17px; width: 300px; ">-->
+                                <!--<div class="dropdown-menu" style="padding:17px; ">-->
+                                    <div class="dropdown-menu">
+                                    <div class="container-fluid">
+                                        <form class="form" role="form" id="formLogin"> 
+                                            <div class="form-group-sm">
+                                                <input name="username" id="emailField" type="text" placeholder="Username" size="30"> 
+                                            </div>
+                                            <br>
+                                            <div class="form-group-sm">
+                                                <input name="password" id="passwordField" type="password" placeholder="Password" size="30"><br>
+                                            </div>
+                                            <br>
+                                            <div class="form-group-sm">
+                                                <p class="valign">Don't have an account yet ? <a class="waves-effect waves-light" id="registerBtn">register</a></p>
+                                                <span id="loginInfo" class="red-text text-darken-2"></span>
+                                            </div>
+                                            <br>
+                                            <div class="form-group-sm">
+                                                <button type="button" id="loginBtn" class="btn btn-sm">Login</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div><!-- /.nav-collapse -->
+                </div><!-- /.container -->
+            </div><!-- /.navbar -->
+        </header>
+
+        <main>
+            <div class="container-fluid">
+                <div class="col-xs-1"></div>
+                <div id="mainContainer" class="col-xs-10">
+
+                <!-- DYNAMIC CONTENT -->
+
+                </div>
+                <div class="col-xs-1"></div>
+
+            </div>
+        </main>
+
+<!--                <footer class="footer">
+                    <div class="container-fluid" >
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h5 class="white-text">SyMeTRIC</h5>
+                                <p class="grey-text text-lighten-4">is a Systems Medicine project funded by the Pays de la Loire french region...<p>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <h5 class="white-text">Main partners</h5>
+                                <ul>
+                                    <li><a class="grey-text text-lighten-3" href="#!">Nantes academic hospital</a></li>
+                                    <li><a class="grey-text text-lighten-3" href="#!">Nantes University</a></li>
+                                    <li><a class="grey-text text-lighten-3" href="#!">Angers academic hospital</a></li>
+                                    <li><a class="grey-text text-lighten-3" href="#!">Angers University</a></li>
+                                    <li><a class="grey-text text-lighten-3" href="#!">Institut de Cancérologie de l'Ouest</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                © 2015 Copyright Text
+                            </div>
+                        </div>
+                    </div>
+                </footer>-->
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
+        <script type="text/javascript" src="js/lib/underscore-min.js"></script>
+        <script type="text/javascript" src="js/lib/backbone-min.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/lib/d3.v3.min.js"></script>
+        <!--<script type="text/javascript" src="js/lib/cytoscape.min.js"></script>-->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+
+        <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+        <script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
+        
+        <!--<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>-->
+        <script type="text/javascript" src="js/lib/cytoscape2.7.17.min.js"></script>
+        <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-spread/1.0.9/cytoscape-spread.js"></script>
+        <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
+        <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cola/1.1.1/cytoscape-cola.js"></script>
+
+        
+        <script type="text/javascript" src="js/lib/codemirror.js"></script>
+        <script type="text/javascript" src="js/lib/sparql.js"></script>
+        <script type="text/javascript" src="js/lib/turtle.js"></script>
+
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="js/departements.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/APIs/userAPI.js"></script>
+        <!-- VIEWS -->
+        <script type="text/javascript" src="js/views/epidemioView.js"></script>
+        <script type="text/javascript" src="js/views/provenanceView.js"></script>
+        <script type="text/javascript" src="js/views/systemicView.js"></script>
+        <!-- APIs -->
+        <script type="text/javascript" src="js/APIs/provenanceAPI.js"></script>
+        <script type="text/javascript" src="js/APIs/epidemioAPI.js"></script>
+        <script type="text/javascript" src="js/APIs/systemicAPI.js"></script>
+        <!-- RENDERING -->
+        <script type="text/javascript" src="js/APIs/rendering/mapFranceRendering.js"></script>
+        <script type="text/javascript" src="js/APIs/rendering/provenanceRendering.js"></script>
+        <script type="text/javascript" src="js/APIs/rendering/epidemioRendering.js"></script>
+        <script type="text/javascript" src="js/APIs/rendering/systemicRendering.js"></script>
+        
+        <!--<script src="js/testView.js"></script>-->
+
+    </body>
+</html>

@@ -1,0 +1,106 @@
+<div class="row">
+    <div class="col-xs-12">
+            <h3>Regulatory Network Demo</h3>
+            This demonstration aims at reconstitute regulatory network from genes, through Semantic Web.<br />
+            We are querying PathwayCommons with SPARQL queries to get the transcriptional factors that control your list of genes.
+    </div>
+</div>
+
+<p></p>
+
+<div class="row">
+    <div class="col-xs-2">
+        <div class="btn-group" data-toggle="buttons" style="padding-top: 28px;">
+            <label class="btn btn-default active" id="query-type">
+                <input type="radio" checked="checked" autocomplete="off" name="query-type" value="name">Name
+            </label>
+            <label class="btn btn-default" id="query-type">
+                <input type="radio" autocomplete="off" name="query-type" value="id">Id
+            </label>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <label for="inputGeneList">Your list of genes</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="inputGeneList" placeholder="AGPAT6,GALT,DHCR24,FTFD1,CAD" value="AGPAT6,GALT,DHCR24,FTFD1,CAD">
+            <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="btnSearchRegulatoryNetwork">Go!</button>
+            </span>
+                
+        </div><!-- /input-group -->
+        <a class="label label-primary" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSparql" style="margin-right:0.3em">
+            <i class="material-icons" style="font-size:11px;">visibility</i> show SPARQL query example
+        </a>
+        <span class="label label-info" id="total-info-nodes"></span>
+        <span class="label label-info" id="total-info-edges"></span>        
+        
+    </div>
+    
+    <div class="col-xs-4">
+        <div></div>
+        <span class="label label-info" id="sendingQuery" style="display:none;">Your query is running...</span>
+        <span class="label label-warning" id="emptyQuery" style="display:none;">Please write your query before sending.</span>
+        <span class="label label-danger" id="errorQuery" style="display:none;">It seems like an error occurred during your query. Please contact administrator.</span>
+        <span class="label label-info" id="noResult" style="display:none;">No result found.</span>
+    </div>
+</div>
+
+<p></p>
+
+<div class="row">
+    <div class="col-xs-8">
+        <div id="collapseSparql" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseSparql" style="font-size:10px;">
+            <div class="panel-body">
+                <p id="SPARQLquery">
+                    &#35; Initial query <br />
+                    PREFIX bp: &lt;http://www.biopax.org/release/biopax-level3.owl#&gt; <br />
+                    PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; <br />
+                    PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; <br />
+                    CONSTRUCT { <br />
+                    ?tempReac bp:displayName ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source . <br />
+                    } WHERE{  <br />
+                    FILTER( (?controlledName = 'Transcription of "geneName"'^^xsd:string>)
+                        and (?controllerName != '"geneName"'^^xsd:string>)
+                        and (?source != "mirtarbase"^^xsd:string>) ) . <br />
+                    ?tempReac a bp:TemplateReactionRegulation . <br />
+                    ?tempReac bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source . <br />
+                    ?controlled bp:displayName ?controlledName . <br />
+                    ?controller bp:displayName ?controllerName . <br />
+                    } <br />
+                    GROUP BY ?controlledName ?controllerName
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-xs-10">
+		<div id="cy" style="min-width: 400px; height:600px; display:block;"></div>
+	</div>
+        <div class="col-xs-2">
+            <div class="panel panel-default" id="next-level-regulation" style="min-width:220px;font-size:12px;display:none;">
+                <div class="panel-heading">
+                    <label>Select gene to add their regulation connexion</label>
+                    <div class="input-group" id="input-next-regulation"  style="max-height:310px;overflow: auto;display:block">
+                        
+                    </div>
+                    <button class="btn btn-default" type="button" id="btnRunNextRegulation">Run</button>
+                </div>
+            </div>
+            <div class="panel panel-default" id="graphe-legend" style="min-width:220px;font-size:12px;display:none;">
+                <div class="panel-heading">
+                    <label><i class="glyphicon glyphicon-info-sign"></i> Legend</label>
+                    <p>
+                        Blue arrows = TFs ACTIVATION <br />
+                        Grey arrows = TFs INHIBITION <br />
+                        Red circles = INITAL INPUT <br />
+                        Orange circles = LAST INPUT
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default" id="btn-download" style="margin-bottom:5px;display:none;">
+                <a id="a" target="_blank"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+            </button>
+        </div>
+</div>

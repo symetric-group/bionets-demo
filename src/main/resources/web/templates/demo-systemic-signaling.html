@@ -1,0 +1,123 @@
+<div class="row">
+    <div class="col-xs-12">
+            <h3>Signaling Network Demo</h3>
+            This demonstration aims at reconstitute signaling network from genes, through Semantic Web.<br />
+            We are querying PathwayCommons with SPARQL queries to get interactions (e.g. Catalysis, Transcritpional factors, Phosphorylation) that control your list of genes.
+    </div>
+</div>
+
+<p></p>
+<div class="row">
+    <div class="col-xs-6">
+        <label for="inputGeneList">Your list of genes</label>
+        <div class="input-group">
+                <input type="text" class="form-control" id="inputSignalingGeneList" placeholder="EGFR,GRB2,SOS1,KRAS,BRAF" value="EGFR,GRB2,SOS1,KRAS,BRAF">
+                <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" id="btnSearchSignalingNetwork">Go!</button>
+                </span>
+                
+        </div><!-- /input-group -->
+        <a class="label label-primary" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSparql" style="margin-right:0.3em">
+            <i class="material-icons" style="font-size:11px;">visibility</i> show SPARQL query example
+        </a>
+        <span class="label label-info" id="total-info-nodes"></span>
+        <span class="label label-info" id="total-info-edges"></span>
+    </div>
+    <div class="col-xs-6">
+        <div></div>
+        <span class="label label-info" id="sendingQuery" style="display:none;">Your query is running...</span>
+        <span class="label label-warning" id="emptyQuery" style="display:none;">Please write your query before sending.</span>
+        <span class="label label-danger" id="errorQuery" style="display:none;">It seems like an error occurred during your query. Please contact administrator.</span>
+        <span class="label label-info" id="noResult" style="display:none;">No result found.</span>
+    </div>
+</div>
+    
+<p></p>
+
+<div class="row">
+    <div class="col-xs-8">
+        <div id="collapseSparql" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseSparql" style="font-size:10px;">
+            <div class="panel-body">
+                <p id="SPARQLquery">
+                    &#35; Initial query <br />
+                    PREFIX bp: &lt;http://www.biopax.org/release/biopax-level3.owl#&gt; <br />
+                    PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; <br />
+                    PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; <br />
+                    CONSTRUCT { <br />
+                    ?tempReac bp:displayName ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source . <br />
+                    } WHERE{  <br />
+                    FILTER( (?controlledName = 'Transcription of "geneName"'^^xsd:string>)
+                        and (?controllerName != '"geneName"'^^xsd:string>)
+                        and (?source != "mirtarbase"^^xsd:string>) ) . <br />
+                    ?tempReac a bp:TemplateReactionRegulation . <br />
+                    ?tempReac bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source . <br />
+                    ?controlled bp:displayName ?controlledName . <br />
+                    ?controller bp:displayName ?controllerName . <br />
+                    } <br />
+                    GROUP BY ?controlledName ?controllerName
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--div class="form-group">
+    <div class="panel-group" id="accordion" role="tablist">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSparql" style="font-size:10px;">
+                        <i class="material-icons" style="font-size:10px;">visibility</i> SPARQL query example
+                    </a>
+                </h4>
+            </div>
+        </div>
+    </div>
+</div-->
+
+<p></p>
+
+<div class="row">
+    <div class="col-xs-10">
+            <div id="cy" style="min-width: 400px; height:600px; display:block;"></div>
+    </div>
+    <div class="col-xs-2">
+         <button type="button" class="btn btn-default" id="btn-collapse" data-toggle="collapse" data-target="#panel-signaling" style="display:none;">
+            <i class="glyphicon glyphicon-menu-hamburger"></i>
+        </button>
+        <div class="collapse" id="panel-signaling">        
+            <div class="panel panel-default" id="next-level-signaling" style="min-width:230px;font-size:12px;">
+                <div class="panel-heading">
+                    <label>Select gene to add their signaling connexion</label>
+                    <div class="input-group" id="input-next-signaling"  style="max-height:310px;overflow:auto;display:block;">
+
+                    </div>
+                    <button class="btn btn-default" type="button" id="btnRunNextSignaling">Run</button>
+                </div>
+            </div>
+            <div class="panel panel-default" id="graphe-legend" style="min-width:230px;font-size:12px;">
+                <div class="panel-heading">
+                    <label><i class="glyphicon glyphicon-info-sign"></i> Legend</label>
+                        <div class="legend">
+                        <i class="glyphicon glyphicon-arrow-right" style="color:#3399ff;"></i> = TFs activation <br />
+                        <i class="glyphicon glyphicon-arrow-right" style="color:#000;"></i> = TFs inhibition <br />
+                        <div class="circle" style="border-radius: 50%;width:10px;height:10px;background:red;display:inline-block;"></div> = initial input <br />
+                        <div class="circle" style="border-radius: 50%;width:10px;height:10px;background:#FFBF00;display:inline-block;"></div> = last input <br />
+                        <div class="circle" style="border-radius: 50%;width:10px;height:10px;background:#666;display:inline-block;"></div> = Protein <br />
+                        <div class="circle" style="border-radius: 50%;width:10px;height:10px;background:#fff;border:3px solid #3366ff;display:inline-block;"></div> = DNA <br />
+                        <div class="circle" style="border-radius: 50%;width:10px;height:10px;background:#fff;border:3px solid #00b33c;display:inline-block;"></div> = RNA <br />
+                        <div class="haxagon-1" style="float:left;border-right: 3px solid #666;border-top: 6px solid transparent;border-bottom: 6px solid transparent;"></div>
+                        <div class="hexagon-2" style="float:left;width: 6px;height: 12px;background-color: #666;"></div>
+                        <div class="hexagon-3" style="float:left;border-left: 3px solid #666;border-top: 6px solid transparent;border-bottom: 6px solid transparent;"></div>  = Complex <br />
+                        <div class="diamond" style="width:0;height: 0; border: 8px solid transparent; border-bottom: 4px solid #666; position: relative; top: -8px;display:inline-block;"></div> = Small Moclecule <br />
+                        </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default" id="btn-download" style="margin-bottom:5px;">
+                <a id="a" target="_blank"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+            </button>
+        </div>
+    </div>
+</div>
+
+<p></p>
