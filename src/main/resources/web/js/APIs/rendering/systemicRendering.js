@@ -408,7 +408,7 @@ function displayQttInfo(cy){
     var nbEdges = cy.edges().size();
     document.getElementById("total-info-nodes").innerHTML = nbNodes+" nodes";
     document.getElementById("total-info-edges").innerHTML = nbEdges+" edges";
-    document.getElementById("btn-download").style.display = "block";
+    document.getElementById("btn-download").style.display = "inline-block";
 };
 
 /**

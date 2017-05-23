@@ -24,7 +24,7 @@ Run the web appliation
 
     java -jar target/linked-bionet-1.0-SNAPSHOT-datahub-launcher.jar
    
-See on http://127.0.0.1:8091/
+See on http://localhost:8091/
 
 ## Maven dependencies 
 This software is built on top of the following Java dependencies : 
@@ -34,8 +34,6 @@ This software is built on top of the following Java dependencies :
  - Log4J (https://logging.apache.org/log4j/2.0/)
  - Commons CLI (https://commons.apache.org/proper/commons-cli/)
  - Commons Lang (https://commons.apache.org/proper/commons-lang/)
- 
-More details can be found in the [pom.xml](symetric-jena-network/pom.xml) file. 
 
 ## License
 TODO
