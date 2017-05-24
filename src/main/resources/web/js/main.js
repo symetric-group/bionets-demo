@@ -42,3 +42,24 @@ $(document).ready(function () {
 
 });
 
+function alertTimeout(wait) {
+    setTimeout(function () {
+        $('#footer').children('.alert:last-child').remove();
+    }, wait);
+}
+
+function infoSuccess(message) {
+    console.log("INFO" + message);
+    Materialize.toast(message, 2000);
+}
+
+function infoWarning(message) {
+    console.log("WARN" + message);
+    Materialize.toast("<i class=\"material-icons\">warning</i> " + message, 2000);
+}
+
+function infoError(message) {
+    console.log("ERROR" + message);
+    Materialize.toast("<i class=\"material-icons\">error_outline</i> " + message, 2000);
+}
+

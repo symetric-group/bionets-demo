@@ -24,9 +24,9 @@ var DemoSysbioView = Backbone.View.extend({
     events: {
         "click #btnSearchRegulatoryNetwork": "querySearchNetwork",
         "click #btnRegulatoryNetwork": "renderRegulatoryNetwork",
-        "click #btnSignalingNetwork": "renderSignalingNetwork",
-        "click #btnSearchSignalingNetwork": "querySearchSignalingNetwork",
-        "click #query-type": "queryType"
+        "click #btnAutomaticNetwork": "renderAutomaticNetwork",
+        "click #query-type": "queryType",
+        "change #inputFile": "inputFile"
     },
     renderRegulatoryNetwork: function () {
         var that = this;
@@ -38,10 +38,10 @@ var DemoSysbioView = Backbone.View.extend({
         }, 'html');
         return this;
     },
-    renderSignalingNetwork: function () {
+    renderAutomaticNetwork: function () {
         var that = this;
         //Fetching the template contents
-        $.get('templates/demo-systemic-signaling.html', function (data) {
+        $.get('templates/demo-systemic-automatic.html', function (data) {
             template = _.template(data, {});//Option to pass any dynamic values to template
             that.$el.html(template());//adding the template content to the main template.
             
@@ -86,45 +86,7 @@ var DemoSysbioView = Backbone.View.extend({
             document.getElementById("errorQuery").style.display = 'none';
             document.getElementById("noResult").style.display = 'none';
         }
-    },
-    querySearchSignalingNetwork: function () {
-        console.log("querySearchSignalingNetworkEvt");
-        // Initialize graphe visualization
-        var cy = initialCy();
-        var genesList = $('#inputSignalingGeneList').val().replace(/\s/g, '');
-        if (genesList !== "") {
-            /** 
-             * Hide / display messages
-             */
-            document.getElementById("emptyQuery").style.display = 'none';
-            document.getElementById("errorQuery").style.display = 'none';
-            document.getElementById("sendingQuery").style.display = 'block';
-            document.getElementById("next-level-signaling").style.display = 'none';
-            document.getElementById("noResult").style.display = 'none';
-            /**
-             * Initialize checkbox content
-             */
-            var container = document.getElementById("input-next-signaling");
-            while (container.hasChildNodes()){
-                container.removeChild(container.firstChild);
-            }
-            // Make SPARQL initial query to PathwayCommons endpoint
-            sparqlSignaling(genesList, cy);
-            // Listen to event
-            $( "#btnRunNextSignaling" ).click(function() {
-                // Get gene list
-                var regulatorList = updateList("signaling");
-                if (regulatorList.length > 0){
-                    // Make SPARQL queries to PathwayCommons endpoint
-                    nextLevelSignaling(regulatorList, cy);
-                }
-            });
-        }else{
-            document.getElementById("emptyQuery").style.display = 'block';
-            document.getElementById("errorQuery").style.display = 'none';
-            document.getElementById("noResult").style.display = 'none';
-        }
-    },        
+    },       
     /**
     * Listen to input type
     */
@@ -136,6 +98,13 @@ var DemoSysbioView = Backbone.View.extend({
         }else {
             $('#inputGeneList').val('AGPAT6,GALT,DHCR24,FTFD1,CAD');
         }
+        
+    },
+    /**
+    * Listen to input file
+    */
+    inputFile: function() {
+        $('#filePath').html($('#inputFile').val().replace("C:\\fakepath\\", ''));
         
     }
 });
