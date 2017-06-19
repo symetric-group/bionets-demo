@@ -59,7 +59,7 @@ function infoWarning(message) {
 }
 
 function infoError(message) {
-    console.log("ERROR" + message);
+    console.log("ERROR " + message);
     Materialize.toast("<i class=\"material-icons\">error_outline</i> " + message, 2000);
 }
 

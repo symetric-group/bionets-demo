@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-xs-12">
-            <h3>Automatic Network Assembly</h3>
+            <h3>Batch Network Assembly</h3>
             This demonstration aims at reconstitute regulation network from genes, through Semantic Web.<br />
             We are querying PathwayCommons with SPARQL queries to get Transcriptional Factors that control your list of genes.
     </div>
@@ -9,29 +9,31 @@
 <p></p>
 <div class="row">
     <div class="col-xs-6">
-        <form>
-            <div class="form-group">
-                <label for="inputFile">List of genes</label><br />
-                <button type="button" class="btn btn-default" onClick="$('#inputFile').click();"><i class="glyphicon glyphicon-file"></i> Browse...</button>
-                <p id="filePath" style="display: inline"></p>
-                <input type="file" class="btn btn-default" id="inputFile" style="display: none;"><br>
-                <small id="fileHelp" class="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>Parameters</strong>
             </div>
-            <label for="input-type">Your genes are : </label>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-default active" id="query-type">
-                    <input type="radio" checked="checked" autocomplete="off" name="input-type" value="name">Names
-                </label>
-                <label class="btn btn-default" id="query-type">
-                    <input type="radio" autocomplete="off" name="input-type" value="id">IDs
-                </label>
-            </div>
-            <div class="form-group row">
-                <div class="offset-sm-2 col-sm-10">
-                <button class="btn btn-primary" type="button" id="btnRunBatch">Run</button>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="exampleTextarea">List of genes</label>
+                    <textarea class="form-control" id="geneList" rows="3" placeholder="SLC25A21,TREX2,ATP1B3,DGUOK,ACOT1,CERS5,RIPK4,STK38,G6PC,CDK6,SOAT2,RFNG,FGFR1,FAAH2,DPYD,XYLT1,CDK10,IDH3A,LDHB,ALG6,MGAT2,PNPO,MINK1,ADCY2,KAT6A,TNKS,PTPRB,SMG1,PPM1J,SENP2,ALG1,NOS1,AAK1,GYS1,RPA2" ></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="input-type">Your genes are</label><br>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active" id="query-type">
+                            <input type="radio" checked="checked" autocomplete="off" name="input-type" value="name">Names
+                        </label>
+                        <label class="btn btn-default" id="query-type">
+                            <input type="radio" autocomplete="off" name="input-type" value="id">IDs
+                        </label>
+                    </div>
                 </div>
             </div>
-        </form>
+            <div class="panel-footer">
+                <button class="btn btn-primary" type="button" id="btnRunBatch">Run</button>
+            </div>
+        </div>
     </div>
     <div class="col-xs-6">
         <div></div>

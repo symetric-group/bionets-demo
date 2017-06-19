@@ -16,21 +16,16 @@ import java.net.URI;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -284,58 +279,24 @@ public class Systemic {
     }
     
     /**
-     * Next levels of regulation
-     * @author Marie Lefebvre
-     * @param gene : String - controller of initial network regulation
-     * @return finalModel : Model - network regulation of the gene
+     *  Run batch command for automatic network assembly
+     *  
+     * @param genes
+     * @param queryType
+     * @return
      */
-    public Model ConstuctRecursiveQuery(RDFNode gene) throws IOException {
-        // SPARQL Query to get controller of a model
-        String queryString = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-            +"  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-            +"  CONSTRUCT {\n"
-            +"      ?tempReac bp:displayName ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source .\n"
-            +"  } WHERE { \n"
-            +"      FILTER( ( regex(?controlledName, ' "+gene.toString().toUpperCase()+"$', 'i') ) && !regex(?source, 'mirtar', 'i') ) .\n"
-            +"      ?tempReac a bp:TemplateReactionRegulation .\n"
-            +"      ?tempReac bp:displayName ?reacName ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source .\n"
-            +"      ?controlled bp:displayName ?controlledName .\n"
-            +"      ?controller bp:displayName ?controllerName .\n "
-            +"  }";
-        Model finalModel = ModelFactory.createDefaultModel();
-        // Create query
-        Query query = QueryFactory.create(queryString) ;
-        String contentType = "application/json";
-        // URI of the SPARQL Endpoint
-        String accessUri = "http://rdf.pathwaycommons.org/sparql";
-        StringBuilder result = new StringBuilder();
-
-        URI requestURI = javax.ws.rs.core.UriBuilder.fromUri(accessUri)
-                   .queryParam("query", "{query}")
-                   .queryParam("format", "{format}")
-                   .build(query, contentType);
-        URLConnection con;
-        try {
-            con = requestURI.toURL().openConnection();
-            con.addRequestProperty("Accept", contentType);
-            InputStream in = con.getInputStream();
-            
-            // Read result
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            
-            String line;
-            while((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-            // Prepare model
-            ByteArrayInputStream bais = new ByteArrayInputStream(result.toString().getBytes());
-            finalModel.read(bais, null, "RDF/JSON");
-        } catch (Exception ex) {
-            logger.error(ex);
-        }
-        System.out.println("Final Model en cours");
-        return finalModel;
-    }
+//    @POST
+//    @Path("/network-automatic")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response automaticNetwork(@FormParam("genes") String genes, @FormParam("type") String queryType ) {
+//        try {
+//            System.out.println(genes);
+//            return Response.status(200).header("Access-Control-Allow-Origin", "*").build(); 
+//        } catch (Exception ex) {
+//            logger.error(ex);
+//            return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly").build();
+//        }
+//    }
 }
 
 

@@ -14,6 +14,7 @@ function sparqlSysBio(genesList, queryType, cy) {
     var endpointURL = rootURL + '/systemic/network';
     genesList = genesList.split(",");
     var genesJSON = JSON.stringify(genesList);
+    console.log(genesJSON, queryType);
     
     $.ajax({
         type: 'GET',
@@ -274,6 +275,36 @@ function nextLevelSignaling(genesList, cy) {
             document.getElementById("errorQuery").style.display = 'block';
             document.getElementById("sendingQuery").style.display = 'none';
             infoError("SPARQL querying failure: " + errorThrown);
+            console.log(jqXHR.responseText);
+        }
+    });
+};
+
+/**
+ * API Run batch algo
+ * @param {array} genesList
+ * 
+ */
+function batchJob(genesList, queryType) {
+    var endpointURL = rootURL + '/automatic/batch';
+    document.getElementById("sendingQuery").style.display = 'block';
+    genesList = genesList.split(",");
+    var genesJSON = JSON.stringify(genesList);
+    // Request on signaling part
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: endpointURL,
+        data: 'genes=' + genesJSON + '&type=' + queryType,
+        //dataType: "json",
+        crossDomain: true,
+        success: function (data, textStatus, jqXHR) {
+            document.getElementById("sendingQuery").style.display = 'none';
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            document.getElementById("errorQuery").style.display = 'block';
+            document.getElementById("sendingQuery").style.display = 'none';
+            infoError(" Failure: " + errorThrown);
             console.log(jqXHR.responseText);
         }
     });

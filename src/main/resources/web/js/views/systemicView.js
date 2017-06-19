@@ -26,7 +26,7 @@ var DemoSysbioView = Backbone.View.extend({
         "click #btnRegulatoryNetwork": "renderRegulatoryNetwork",
         "click #btnAutomaticNetwork": "renderAutomaticNetwork",
         "click #query-type": "queryType",
-        "change #inputFile": "inputFile"
+        "click #btnRunBatch": "runBatch"
     },
     renderRegulatoryNetwork: function () {
         var that = this;
@@ -98,14 +98,23 @@ var DemoSysbioView = Backbone.View.extend({
         }else {
             $('#inputGeneList').val('AGPAT6,GALT,DHCR24,FTFD1,CAD');
         }
-        
-    },
+        // When 'id' checked, return 'name'
+        if ($('input[name=input-type]:checked').val() !== 'id'){
+            $('#geneList').prop('placeholder', "ENSG00000158669,HGNC:4135,ENSG00000116133,ENSG00000084774");
+        }else {
+            $('#geneList').prop('placeholder', "SLC25A21,TREX2,ATP1B3,DGUOK,ACOT1,CERS5,RIPK4,STK38,G6PC,CDK6,SOAT2,RFNG,FGFR1,FAAH2,DPYD,XYLT1,CDK10,IDH3A,LDHB,ALG6,MGAT2,PNPO,MINK1,ADCY2,KAT6A,TNKS,PTPRB,SMG1,PPM1J,SENP2,ALG1,NOS1,AAK1,GYS1,RPA2");
+        }
+    },       
     /**
-    * Listen to input file
+    * API to run batch command
     */
-    inputFile: function() {
-        $('#filePath').html($('#inputFile').val().replace("C:\\fakepath\\", ''));
-        
+    runBatch: function() {
+        var genesList = $('#geneList').val().replace(/\s/g, '');
+        if (genesList !== "") {
+            var queryType = $('input[name=input-type]:checked').val();
+            batchJob(genesList, queryType);
+        }
+                
     }
 });
 
