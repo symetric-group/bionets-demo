@@ -287,19 +287,65 @@ function nextLevelSignaling(genesList, cy) {
  */
 function batchJob(genesList, queryType) {
     var endpointURL = rootURL + '/automatic/batch';
+    // display info
     document.getElementById("sendingQuery").style.display = 'block';
+    document.getElementById("noResult").style.display = 'none';
+    // gene list format
     genesList = genesList.split(",");
     var genesJSON = JSON.stringify(genesList);
-    // Request on signaling part
+    // Request on automatic assembly
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
         url: endpointURL,
         data: 'genes=' + genesJSON + '&type=' + queryType,
-        //dataType: "json",
         crossDomain: true,
         success: function (data, textStatus, jqXHR) {
             document.getElementById("sendingQuery").style.display = 'none';
+            var items = JSON.stringify(data);
+            if ( isEmpty(items) === true ){
+                document.getElementById("noResult").style.display = 'block';
+            }else{
+                document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
+                    var arrData = JSON.parse(JSON.stringify(data));
+                    var csv = "origin,target,type,source";
+                    for (var object in arrData) {
+                        var row = "";
+                        //2nd loop will extract each column and convert it in string comma-seprated
+                        for (var index in arrData[object]) {
+                            row += '"' + arrData[object][index][0]["value"] + '",';
+                           // console.log(arrData[object][index][0]["value"]);
+                        }
+                        row.slice(0, row.length - 1);
+                        //add a line break after each row
+                        csv += row + '\r\n';
+                    }
+//                    var csv = convert(items);
+//                    //Initialize file format you want csv or xls
+                    var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
+//
+//                    //this trick will generate a temp <a /> tag
+                    var link = document.getElementById("a");
+                    link.href = uri;
+//
+//                    //set the visibility hidden so it will not effect on your web-layout
+////                    link.style = "visibility:hidden";
+                    link.download = "graph.csv";
+//
+//                    //this part will append the anchor tag and remove it after automatic click
+////                    document.body.appendChild(link);
+                    link.click();
+                });
+                document.getElementById('btn-download-json').addEventListener("click", function exportAsJSON() {
+                    console.log("export as json");
+                    var JSON = items;
+                    var c = document.getElementById('c');
+                    var blob = new Blob([JSON], {'type':'application/json'});
+                    c.href = window.URL.createObjectURL(blob);
+                    c.download = 'graph.json';
+                    c.click();
+                });
+            }
         },
         error: function (jqXHR, textStatus, errorThrown) {
             document.getElementById("errorQuery").style.display = 'block';
@@ -308,4 +354,27 @@ function batchJob(genesList, queryType) {
             console.log(jqXHR.responseText);
         }
     });
+};
+
+function convert(data) {
+    var CSV = '';
+    var arrData = typeof data != 'object' ? JSON.parse(data) : data;
+    //1st loop is to extract each row
+    for (var i = 0; i < Object.keys(arrData).length; i++) {
+        var row = "";
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+            row += '"' + arrData[i][index] + '",';
+        }
+        row.slice(0, row.length - 1);
+        //add a line break after each row
+        CSV += row + '\r\n';
+    }
+    if (CSV == '') {
+        alert('No data available');
+        return;
+    }else {
+        return CSV;
+    }
+
 };
