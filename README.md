@@ -1,12 +1,12 @@
-# Linked-bionets
+# BRAvo : Biological netwoRk Assembly
 
 ## Synopsis
-Linked-bionets is a web interface that aims to assemble regulatory networks.
+BRAvo is a web interface that aims to assemble regulatory networks.
 
 ## Motivations
 Huge efforts address the organization of biological knowledge through linked open databases. These databases can be automatically queried to reconstruct a large variety of biological networks such as regulatory networks. Assembling networks still implies manual operations due to _(i)_ source-specific identification of biological entities, _(ii)_ source-specific semantics for entity-entity relationships, _(iii)_ proliferating heterogeneous life-science databases with redundant information and _(iv)_ the difficulty of recovering the logical flow of a biological pathway due to the bidirectionality of chemical reactions. Homogenization of biological networks is therefore costly and error-prone. 
 
-**With linked-bionets, we propose a framework based on Semantic Web technologies. It addresses _(i)_ the uniform identification of multi-source biological entities, _(ii)_ the description of labeled directed graphs through RDF, and _(iii)_ the use of [BioPAX](http://www.biopax.org/) as a semantic reference.**
+**With BRAvo, we propose a framework based on Semantic Web technologies. It addresses _(i)_ the uniform identification of multi-source biological entities, _(ii)_ the description of labeled directed graphs through RDF, and _(iii)_ the use of [BioPAX](http://www.biopax.org/) as a semantic reference.**
 
 ## Requirements
 TODO
@@ -36,4 +36,4 @@ This software is built on top of the following Java dependencies :
  - Commons Lang (https://commons.apache.org/proper/commons-lang/)
 
 ## License
-TODO
+MIT
