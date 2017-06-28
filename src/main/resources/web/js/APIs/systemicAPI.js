@@ -288,8 +288,8 @@ function nextLevelSignaling(genesList, cy) {
 function batchJob(genesList, queryType) {
     var endpointURL = rootURL + '/automatic/batch';
     // display info
-    document.getElementById("sendingQuery").style.display = 'block';
-    document.getElementById("noResult").style.display = 'none';
+    document.getElementById("auto-sendingQuery").style.display = 'block';
+    document.getElementById("auto-noResult").style.display = 'none';
     // gene list format
     genesList = genesList.split(",");
     var genesJSON = JSON.stringify(genesList);
@@ -301,11 +301,12 @@ function batchJob(genesList, queryType) {
         data: 'genes=' + genesJSON + '&type=' + queryType,
         crossDomain: true,
         success: function (data, textStatus, jqXHR) {
-            document.getElementById("sendingQuery").style.display = 'none';
+            document.getElementById("auto-sendingQuery").style.display = 'none';
             var items = JSON.stringify(data);
             if ( isEmpty(items) === true ){
-                document.getElementById("noResult").style.display = 'block';
+                document.getElementById("auto-noResult").style.display = 'block';
             }else{
+                document.getElementById('panel-download-success').style.display = 'block';
                 document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
                     var arrData = JSON.parse(JSON.stringify(data));
                     var csv = "origin,target,type,source";
@@ -348,8 +349,8 @@ function batchJob(genesList, queryType) {
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            document.getElementById("errorQuery").style.display = 'block';
-            document.getElementById("sendingQuery").style.display = 'none';
+            document.getElementById("auto-errorQuery").style.display = 'block';
+            document.getElementById("auto-sendingQuery").style.display = 'none';
             infoError(" Failure: " + errorThrown);
             console.log(jqXHR.responseText);
         }

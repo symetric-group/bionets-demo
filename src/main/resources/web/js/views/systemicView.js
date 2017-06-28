@@ -23,31 +23,31 @@ var DemoSysbioView = Backbone.View.extend({
     },
     events: {
         "click #btnSearchRegulatoryNetwork": "querySearchNetwork",
-        "click #btnRegulatoryNetwork": "renderRegulatoryNetwork",
-        "click #btnAutomaticNetwork": "renderAutomaticNetwork",
+//        "click #btnRegulatoryNetwork": "renderRegulatoryNetwork",
+//        "click #btnAutomaticNetwork": "renderAutomaticNetwork",
         "click #query-type": "queryType",
         "click #btnRunBatch": "runBatch"
     },
-    renderRegulatoryNetwork: function () {
-        var that = this;
-        //Fetching the template contents
-        $.get('templates/demo-systemic-regulatory.html', function (data) {
-            template = _.template(data, {});//Option to pass any dynamic values to template
-            that.$el.html(template());//adding the template content to the main template.
-            
-        }, 'html');
-        return this;
-    },
-    renderAutomaticNetwork: function () {
-        var that = this;
-        //Fetching the template contents
-        $.get('templates/demo-systemic-automatic.html', function (data) {
-            template = _.template(data, {});//Option to pass any dynamic values to template
-            that.$el.html(template());//adding the template content to the main template.
-            
-        }, 'html');
-        return this;
-    },
+//    renderRegulatoryNetwork: function () {
+//        var that = this;
+//        //Fetching the template contents
+//        $.get('templates/demo-systemic-regulatory.html', function (data) {
+//            template = _.template(data, {});//Option to pass any dynamic values to template
+//            that.$el.html(template());//adding the template content to the main template.
+//            
+//        }, 'html');
+//        return this;
+//    },
+//    renderAutomaticNetwork: function () {
+//        var that = this;
+//        //Fetching the template contents
+//        $.get('templates/demo-systemic-automatic.html', function (data) {
+//            template = _.template(data, {});//Option to pass any dynamic values to template
+//            that.$el.html(template());//adding the template content to the main template.
+//            
+//        }, 'html');
+//        return this;
+//    },
     querySearchNetwork: function () {
         console.log("querySearchNetworkEvt");
         var queryType = $('input[name=query-type]:checked').val();
@@ -114,7 +114,6 @@ var DemoSysbioView = Backbone.View.extend({
             var queryType = $('input[name=input-type]:checked').val();
             batchJob(genesList, queryType);
         }
-                
     }
 });
 
@@ -123,8 +122,6 @@ var myDemoSysbioView = new DemoSysbioView();
 function initialCy() {
     var cy = cytoscape({
         container: document.getElementById('cy'), // container to render in
-        //boxSelectionEnabled: false,
-        //autounselectify: true,
         style: [ // the stylesheet for the graph
             {
                 selector: 'node',
@@ -156,25 +153,17 @@ function initialCy() {
                     'mid-target-arrow-color': '#ccc',
                     'mid-target-arrow-shape': 'triangle',
                     'curve-style': 'bezier'
-                    //'label': 'data(type)'
                 }
             }
         ],
-//        grabbable: true,
-//        selectable: true,
-//        locked: false,
-//        zoom: 1,
         layout: {
             name: 'cola',
-//            directed: true,
             nodeSpacing: 5,
             avoidOverlap: true,
             maxSimulationTime: 4000,
             flow: { axis: 'y'},
             unconstrIter: 10,
             handleDisconnected: true
-//            fit: true,
-//            padding: 50
         }
     });
     return cy;
