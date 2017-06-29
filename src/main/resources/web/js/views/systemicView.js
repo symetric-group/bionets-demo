@@ -23,31 +23,9 @@ var DemoSysbioView = Backbone.View.extend({
     },
     events: {
         "click #btnSearchRegulatoryNetwork": "querySearchNetwork",
-//        "click #btnRegulatoryNetwork": "renderRegulatoryNetwork",
-//        "click #btnAutomaticNetwork": "renderAutomaticNetwork",
         "click #query-type": "queryType",
         "click #btnRunBatch": "runBatch"
     },
-//    renderRegulatoryNetwork: function () {
-//        var that = this;
-//        //Fetching the template contents
-//        $.get('templates/demo-systemic-regulatory.html', function (data) {
-//            template = _.template(data, {});//Option to pass any dynamic values to template
-//            that.$el.html(template());//adding the template content to the main template.
-//            
-//        }, 'html');
-//        return this;
-//    },
-//    renderAutomaticNetwork: function () {
-//        var that = this;
-//        //Fetching the template contents
-//        $.get('templates/demo-systemic-automatic.html', function (data) {
-//            template = _.template(data, {});//Option to pass any dynamic values to template
-//            that.$el.html(template());//adding the template content to the main template.
-//            
-//        }, 'html');
-//        return this;
-//    },
     querySearchNetwork: function () {
         console.log("querySearchNetworkEvt");
         var queryType = $('input[name=query-type]:checked').val();
@@ -100,7 +78,7 @@ var DemoSysbioView = Backbone.View.extend({
         }
         // When 'id' checked, return 'name'
         if ($('input[name=input-type]:checked').val() !== 'id'){
-            $('#geneList').prop('placeholder', "ENSG00000158669,HGNC:4135,ENSG00000116133,ENSG00000084774");
+            $('#geneList').prop('placeholder', "ENSG00000158669,HGNC:4135,ENSG00000116133,ENSG00000084774,ENSG00000160396,ENSG00000167261,ENSG00000197943,ENSG00000010810,ENSG00000174672,ENSG00000163482,ENSG00000134333,ENSG00000164305,ENSG00000101290,ENSG00000175264,ENSG00000103502,ENSG00000104812,ENSG00000275176,ENSG00000163378,ENSG00000105723,ENSG00000184227,ENSG00000115661,ENSG00000188687,ENSG00000100605,ENSG00000171766,ENSG00000104154,ENSG00000140650,ENSG00000153707,ENSG00000165195,ENSG00000213398,ENSG00000102096");
         }else {
             $('#geneList').prop('placeholder', "SLC25A21,TREX2,ATP1B3,DGUOK,ACOT1,CERS5,RIPK4,STK38,G6PC,CDK6,SOAT2,RFNG,FGFR1,FAAH2,DPYD,XYLT1,CDK10,IDH3A,LDHB,ALG6,MGAT2,PNPO,MINK1,ADCY2,KAT6A,TNKS,PTPRB,SMG1,PPM1J,SENP2,ALG1,NOS1,AAK1,GYS1,RPA2");
         }
