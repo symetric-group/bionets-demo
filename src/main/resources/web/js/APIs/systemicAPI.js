@@ -300,15 +300,15 @@ function batchJob(genesList, queryType) {
         url: endpointURL,
         data: 'genes=' + genesJSON + '&type=' + queryType,
         crossDomain: true,
-        success: function (data, textStatus, jqXHR) {
+        success: function (results, textStatus, jqXHR) {
             document.getElementById("auto-sendingQuery").style.display = 'none';
-            var items = JSON.stringify(data);
-            if ( isEmpty(items) === true ){
+            var features = JSON.stringify(results);
+            if ( isEmpty(features) === true ){
                 document.getElementById("auto-noResult").style.display = 'block';
             }else{
                 document.getElementById('panel-download-success').style.display = 'block';
                 document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
-                    var arrData = JSON.parse(JSON.stringify(data));
+                    var arrData = JSON.parse(features);
                     var csv = "origin,target,type,source";
                     for (var object in arrData) {
                         var row = "";
@@ -326,7 +326,7 @@ function batchJob(genesList, queryType) {
                     var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
 //
 //                    //this trick will generate a temp <a /> tag
-                    var link = document.getElementById("a");
+                    var link = document.getElementById("d");
                     link.href = uri;
 //
 //                    //set the visibility hidden so it will not effect on your web-layout
@@ -339,7 +339,7 @@ function batchJob(genesList, queryType) {
                 });
                 document.getElementById('btn-download-json').addEventListener("click", function exportAsJSON() {
                     console.log("export as json");
-                    var JSON = items;
+                    var JSON = features;
                     var c = document.getElementById('c');
                     var blob = new Blob([JSON], {'type':'application/json'});
                     c.href = window.URL.createObjectURL(blob);
