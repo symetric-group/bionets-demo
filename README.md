@@ -1,7 +1,7 @@
 # BRAvo : Biological netwoRk Assembly
 
 ## Synopsis
-BRAvo is a web interface that aims to assemble regulatory networks.
+BRAvo is a web interface that aims to assemble regulatory networks. It is available at http://vm0131.france-bioinformatique.fr/
 
 ## Motivations
 Huge efforts address the organization of biological knowledge through linked open databases. These databases can be automatically queried to reconstruct a large variety of biological networks such as regulatory networks. Assembling networks still implies manual operations due to _(i)_ source-specific identification of biological entities, _(ii)_ source-specific semantics for entity-entity relationships, _(iii)_ proliferating heterogeneous life-science databases with redundant information and _(iv)_ the difficulty of recovering the logical flow of a biological pathway due to the bidirectionality of chemical reactions. Homogenization of biological networks is therefore costly and error-prone. 
