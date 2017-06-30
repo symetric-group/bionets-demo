@@ -130,101 +130,9 @@ public class Systemic {
             return Response.status(500).header(headerAccept, "*").entity("Error while querying PathwayCommons endpoint").build();
         }
     }
-    
+
     /**
-     *  
-     *  
-     * @param genes
-     * @return
-     * @throws JSONException
-     */
-    @GET
-    @Path("/network-signaling")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response searchSignalingNetwork(@QueryParam("genes") String genes) throws JSONException {
-        
-        JSONArray genesList = new JSONArray(genes);
-        Model transcriptorModel = ModelFactory.createDefaultModel();
-        Model finalModel = ModelFactory.createDefaultModel();
-        
-        try {
-            for(int i=0; i < genesList.length(); i++){
-                if (genesList.get(i) != "" && genesList.get(i) != " ") {
-                    StringBuilder result = new StringBuilder();
-//                    logger.info(genesList.get(i));
-                    // Construct new graphe
-                    // Filter on Trancription Factor and wihtout miRNA
-                    String filterQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                        "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                        "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
-                        "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-                        "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
-                        "PREFIX dcterms: <http://purl.org/dc/terms/>\n" +
-                        "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-                        "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
-                        "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n" +
-                        "PREFIX reactome: <http://identifiers.org/reactome/>\n" +
-                        "PREFIX release: <http://www.reactome.org/biopax/49/48887#>\n" +
-                        "PREFIX up: <http://purl.uniprot.org/core/> \n" +
-                        "PREFIX uniprot: <http://purl.uniprot.org/uniprot/>\n" +
-                        "PREFIX chebi: <http://purl.obolibrary.org/obo/CHEBI_>\n" +
-                        "PREFIX obo2: <http://purl.obolibrary.org/obo#>\n" +
-                        "CONSTRUCT {\n" +
-                        "  ?reaction rdf:id ?reaction ; bp:right ?moleculeName ; bp:controller ?controllerName ; "+
-                            "bp:left ?participantName ; bp:participantType ?participantType ; bp:controlType ?controlType .\n" +
-                        "}WHERE{\n" +
-                        "  OPTIONAL { ?reaction bp:displayName ?reactionName . }\n" +
-                        "  OPTIONAL { \n" +
-                        "    ?catalysis bp:controller ?controller ; bp:controlType ?controlType .\n" +
-                        "    ?controller bp:displayName ?controllerName .\n" +
-                        "  }\n" +
-                        "  ?catalysis bp:controlled* ?reaction .\n" +
-                        "  ?reaction bp:right ?molecule .\n" +
-                        "  ?reaction bp:left|bp:right ?participant .\n" +
-                        "  ?participant bp:displayName ?participantName ; rdf:type ?participantType .\n" +
-                        "  ?molecule bp:displayName ?moleculeName .\n" +
-                        "  VALUES ?moleculeName { '"+genesList.get(i).toString().toUpperCase()+"'^^xsd:string }\n" +
-                        "}order by ?catalysis";
-                    System.out.println("Query created");
-
-                    // Parsing json is more simple than XML
-                    String contentType = "application/json";
-                    // URI of the SPARQL Endpoint
-                    String accessUri = "http://rdf.pathwaycommons.org/sparql";
-
-                    URI requestURI = javax.ws.rs.core.UriBuilder.fromUri(accessUri)
-                               .queryParam("query", "{query}")
-                               .queryParam("format", "{format}")
-                               .build(filterQuery, contentType);
-                    URLConnection con = requestURI.toURL().openConnection();
-                    con.addRequestProperty("Accept", contentType);
-                    InputStream in = con.getInputStream();
-
-                    // Read result
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    
-                    String line;
-                    while((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
-                    // Prepare model
-                    ByteArrayInputStream bais = new ByteArrayInputStream(result.toString().getBytes());
-                    transcriptorModel.read(bais, null, "RDF/JSON");
-                }
-            } // End For Loop
-            
-            finalModel.add(transcriptorModel);
-            final StringWriter writer = new StringWriter(); 
-            finalModel.write(writer, "RDF/JSON");
-            return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(writer.toString()).build(); 
-        } catch (Exception ex) {
-            logger.error(ex);
-            return Response.status(500).header(headerAccept, "*").entity("Error while querying PathwayCommons endpoint").build();
-        }
-    }
-    
-    /**
-     * Next levels of regulation
+     * Use IDs for initial graph
      * @author Marie Lefebvre
      * @param genesList
      * @return model
@@ -277,26 +185,6 @@ public class Systemic {
         }
         return new JSONArray(idToNameList);
     }
-    
-    /**
-     *  Run batch command for automatic network assembly
-     *  
-     * @param genes
-     * @param queryType
-     * @return
-     */
-//    @POST
-//    @Path("/network-automatic")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response automaticNetwork(@FormParam("genes") String genes, @FormParam("type") String queryType ) {
-//        try {
-//            System.out.println(genes);
-//            return Response.status(200).header("Access-Control-Allow-Origin", "*").build(); 
-//        } catch (Exception ex) {
-//            logger.error(ex);
-//            return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly").build();
-//        }
-//    }
 }
 
 
