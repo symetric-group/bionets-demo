@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -32,6 +33,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
 
 /**
@@ -68,9 +70,15 @@ public class Automatic {
             // Final model
             network = regulationConstruct(initialModel, initialModel, geneDone);
             final StringWriter writer = new StringWriter(); 
+            final StringWriter swriter = new StringWriter(); 
             network.write(writer, "RDF/JSON");
+            network.write(swriter, "RDF/XML");
+            HashMap<String, String> scopes = new HashMap<>();
+            scopes.put("json", writer.toString());
+            scopes.put("rdf", swriter.toString());
+            
             System.out.println("Results will be send");
-            return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(writer.toString()).build(); 
+            return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(scopes).build(); 
         } catch (Exception ex) {
             logger.error(ex);
             return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly").build();

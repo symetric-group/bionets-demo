@@ -302,7 +302,7 @@ function batchJob(genesList, queryType) {
         crossDomain: true,
         success: function (results, textStatus, jqXHR) {
             document.getElementById("auto-sendingQuery").style.display = 'none';
-            var features = JSON.stringify(results);
+            var features = JSON.stringify(results["json"]);
             if ( isEmpty(features) === true ){
                 document.getElementById("auto-noResult").style.display = 'block';
             }else{
@@ -345,6 +345,14 @@ function batchJob(genesList, queryType) {
                     c.href = window.URL.createObjectURL(blob);
                     c.download = 'graph.json';
                     c.click();
+                });
+                document.getElementById('btn-download-rdf').addEventListener("click", function exportAsRDF() {
+                    
+                    var b = document.getElementById('b');
+                    var blob = new Blob([results["rdf"]], {'type':'xml/rdf'});
+                    b.href = window.URL.createObjectURL(blob);
+                    b.download = 'graph.rdf';
+                    b.click();
                 });
             }
         },
