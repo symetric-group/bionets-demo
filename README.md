@@ -26,6 +26,8 @@ Run the web appliation
    
 See on http://localhost:8091/
 
+![Web interface home](img/BRAvo-home.png)
+
 ## Maven dependencies 
 This software is built on top of the following Java dependencies : 
  - JENA (https://jena.apache.org)
