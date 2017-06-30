@@ -230,7 +230,7 @@ public class Systemic {
      * @return model
      * @throws org.codehaus.jettison.json.JSONException
      */
-    public JSONArray IdToNameQuery(JSONArray genesList) throws JSONException, IOException {
+    public static JSONArray IdToNameQuery(JSONArray genesList) throws JSONException, IOException {
         List<String> idToNameList = new ArrayList<String>();
         JSONArray idList = genesList;
         for(int i=0; i < idList.length(); i++){

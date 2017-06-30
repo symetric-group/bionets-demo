@@ -33,7 +33,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 
 
 /**
@@ -60,6 +59,13 @@ public class Automatic {
         try {
             // initial list of biological entities
             JSONArray genesList = new JSONArray(genes);
+            
+            // Use of IDs 
+            if ("id".equals(queryType)) {
+                JSONArray idList = genesList;
+                genesList = fr.symetric.api.Systemic.IdToNameQuery(idList);
+            }
+            
             // initial model with direct interaction, first level of regulation
             Object[] initialResults = initialConstruct(genesList);
             System.out.println("Initial graph : DONE");

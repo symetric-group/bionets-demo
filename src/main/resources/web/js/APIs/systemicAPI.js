@@ -315,31 +315,20 @@ function batchJob(genesList, queryType) {
                         //2nd loop will extract each column and convert it in string comma-seprated
                         for (var index in arrData[object]) {
                             row += '"' + arrData[object][index][0]["value"] + '",';
-                           // console.log(arrData[object][index][0]["value"]);
                         }
                         row.slice(0, row.length - 1);
                         //add a line break after each row
                         csv += row + '\r\n';
                     }
-//                    var csv = convert(items);
-//                    //Initialize file format you want csv or xls
+                    //Initialize file format you want csv or xls
                     var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
-//
-//                    //this trick will generate a temp <a /> tag
                     var link = document.getElementById("d");
                     link.href = uri;
-//
-//                    //set the visibility hidden so it will not effect on your web-layout
-////                    link.style = "visibility:hidden";
                     link.download = "graph.csv";
-//
-//                    //this part will append the anchor tag and remove it after automatic click
-////                    document.body.appendChild(link);
                     link.click();
                 });
                 document.getElementById('btn-download-json').addEventListener("click", function exportAsJSON() {
-                    console.log("export as json");
-                    var JSON = features;
+                    var JSON = features.replace('\\','').replace('\n','');
                     var c = document.getElementById('c');
                     var blob = new Blob([JSON], {'type':'application/json'});
                     c.href = window.URL.createObjectURL(blob);
@@ -347,7 +336,6 @@ function batchJob(genesList, queryType) {
                     c.click();
                 });
                 document.getElementById('btn-download-rdf').addEventListener("click", function exportAsRDF() {
-                    
                     var b = document.getElementById('b');
                     var blob = new Blob([results["rdf"]], {'type':'xml/rdf'});
                     b.href = window.URL.createObjectURL(blob);
