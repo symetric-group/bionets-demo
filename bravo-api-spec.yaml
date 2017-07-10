@@ -1,0 +1,25 @@
+swagger: "2.0"
+info:
+  title: BrAvo API
+  description: API description in **Markdown**. 
+  version: 1.0.0
+
+host: api.example.com
+basePath: /v1
+schemes:
+  - http
+  - https
+
+paths:
+  /upRegulation:
+    post:
+      summary: Returns an upstream regulation graph based on a list of target genes. 
+      description: a description
+      produces:
+        - application/json
+      consumes: 
+        - application/json
+      responses:
+        200:
+          description: OK
+#  /downRegulation:
