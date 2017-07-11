@@ -56,6 +56,8 @@ public class Automatic {
     @Path("/batch")
     @Produces(MediaType.APPLICATION_JSON)
     public Response automaticNetwork(@FormParam("genes") String genes, @FormParam("type") String queryType ) {
+        System.out.println(genes);
+        System.out.println(queryType);
         try {
             // initial list of biological entities
             JSONArray genesList = new JSONArray(genes);
@@ -87,7 +89,7 @@ public class Automatic {
             return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(scopes).build(); 
         } catch (Exception ex) {
             logger.error(ex);
-            return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly").build();
+            return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly "+ex).build();
         }
     }
     

@@ -1,25 +1,51 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  title: BrAvo API
-  description: API description in **Markdown**. 
+  title: BRAvo API
+  description: API description in **Markdown**.
   version: 1.0.0
-
-host: api.example.com
-basePath: /v1
+host: vm0131.france-bioinformatique.fr
 schemes:
   - http
   - https
-
 paths:
-  /upRegulation:
+  /automatic/upstream:
     post:
-      summary: Returns an upstream regulation graph based on a list of target genes. 
-      description: a description
+      summary: Run upstream assembly
+      description: Returns an upstream regulation graph based on a list of target genes.
+      parameters:
+        - in: formData
+          name: genes
+          type: array
+          required: true
+          items:
+            type: string
+            format: json
+            enum:
+              - '[MYC,GALT]'
+              - '[ENSG00000158669,HGNC:4135,ENSG00000116133]'
+          description: A person's name.
+        - in: formData
+          name: type
+          type: string
+          required: true
+          enum:
+            - id
+            - name
       produces:
         - application/json
-      consumes: 
+      consumes:
+        - application/x-www-form-urlencoded
+      responses:
+        '200':
+          description: OK
+  /automatic/downstream:
+    post:
+      summary: Run downstream assembly
+      description: Returns a downstream regulation graph based on a list of source genes.
+      produces:
+        - application/json
+      consumes:
         - application/json
       responses:
-        200:
+        '200':
           description: OK
-#  /downRegulation:
