@@ -14,7 +14,6 @@ function sparqlSysBio(genesList, queryType, cy) {
     var endpointURL = rootURL + '/systemic/network';
     genesList = genesList.split(",");
     var genesJSON = JSON.stringify(genesList);
-    console.log(genesJSON, queryType);
     
     $.ajax({
         type: 'GET',
@@ -137,10 +136,11 @@ function nextLevelRegulation(genesList, cy) {
 /**
  * API Run batch algo
  * @param {array} genesList
+ * @param {string} queryType
  * 
  */
-function batchJob(genesList, queryType) {
-    var endpointURL = rootURL + '/automatic/batch';
+function upstreamJob(genesList, queryType) {
+    var endpointURL = rootURL + '/automatic/upstream';
     // display info
     document.getElementById("auto-sendingQuery").style.display = 'block';
     document.getElementById("auto-noResult").style.display = 'none';
@@ -162,12 +162,13 @@ function batchJob(genesList, queryType) {
             }else{
                 document.getElementById('panel-download-success').style.display = 'block';
                 document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
-                    var arrData = JSON.parse(features);
+                    var arrData = JSON.parse(results["json"]);
                     var csv = "origin,target,type,source";
                     for (var object in arrData) {
                         var row = "";
                         //2nd loop will extract each column and convert it in string comma-seprated
                         for (var index in arrData[object]) {
+                            
                             row += '"' + arrData[object][index][0]["value"] + '",';
                         }
                         row.slice(0, row.length - 1);
@@ -191,6 +192,81 @@ function batchJob(genesList, queryType) {
                 });
                 document.getElementById('btn-download-rdf').addEventListener("click", function exportAsRDF() {
                     var b = document.getElementById('b');
+                    var blob = new Blob([results["rdf"]], {'type':'xml/rdf'});
+                    b.href = window.URL.createObjectURL(blob);
+                    b.download = 'graph.rdf';
+                    b.click();
+                });
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            document.getElementById("auto-errorQuery").style.display = 'block';
+            document.getElementById("auto-sendingQuery").style.display = 'none';
+            infoError(" Failure: " + errorThrown);
+            console.log(jqXHR.responseText);
+        }
+    });
+};
+
+/**
+ * API Run batch algo
+ * @param {array} genesList
+ * @param {string} queryType
+ * 
+ */
+function downstreamJob(genesList, queryType) {
+    var endpointURL = rootURL + '/automatic/downstream';
+    // display info
+    document.getElementById("auto-sendingQuery").style.display = 'block';
+    document.getElementById("auto-noResult").style.display = 'none';
+    // gene list format
+    genesList = genesList.split(",");
+    var genesJSON = JSON.stringify(genesList);
+    // Request on automatic assembly
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: endpointURL,
+        data: 'genes=' + genesJSON + '&type=' + queryType,
+        crossDomain: true,
+        success: function (results, textStatus, jqXHR) {
+            document.getElementById("auto-sendingQuery").style.display = 'none';
+            var features = JSON.stringify(results["json"]);
+            if ( isEmpty(features) === true ){
+                document.getElementById("auto-noResult").style.display = 'block';
+            }else{
+                document.getElementById('panel-download-success').style.display = 'block';
+                document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
+                    var arrData = results["json"];
+                    var csv = "origin,target,type,source";
+                    for (var object in arrData) {
+                        var row = "";
+                        //2nd loop will extract each column and convert it in string comma-seprated
+                        for (var index in arrData[object]) {
+                            console.log(arrData[object][index][0]);
+                            row += '"' + arrData[object][index][0]["value"] + '",';
+                        }
+                        row.slice(0, row.length - 1);
+                        //add a line break after each row
+                        csv += row + '\r\n';
+                    }
+                    //Initialize file format you want csv or xls
+                    var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
+                    var link = document.getElementById("d-down");
+                    link.href = uri;
+                    link.download = "graph.csv";
+                    link.click();
+                });
+                document.getElementById('btn-download-json').addEventListener("click", function exportAsJSON() {
+                    var JSON = features.replace('\\','').replace('\n','');
+                    var c = document.getElementById('c-down');
+                    var blob = new Blob([JSON], {'type':'application/json'});
+                    c.href = window.URL.createObjectURL(blob);
+                    c.download = 'graph.json';
+                    c.click();
+                });
+                document.getElementById('btn-download-rdf').addEventListener("click", function exportAsRDF() {
+                    var b = document.getElementById('b-down');
                     var blob = new Blob([results["rdf"]], {'type':'xml/rdf'});
                     b.href = window.URL.createObjectURL(blob);
                     b.download = 'graph.rdf';

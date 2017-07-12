@@ -24,7 +24,8 @@ var DemoSysbioView = Backbone.View.extend({
     events: {
         "click #btnSearchRegulatoryNetwork": "querySearchNetwork",
         "click #query-type": "queryType",
-        "click #btnRunBatch": "runBatch"
+        "click #btnRunBatchUp": "runBatchUp",
+        "click #btnRunBatchDown": "runBatchDown"
     },
     querySearchNetwork: function () {
         console.log("querySearchNetworkEvt");
@@ -84,13 +85,27 @@ var DemoSysbioView = Backbone.View.extend({
         }
     },       
     /**
-    * API to run batch command
+    * API to run batch command for upstream
     */
-    runBatch: function() {
+    runBatchUp: function() {
         var genesList = $('#geneList').val().replace(/\s/g, '');
         if (genesList !== "") {
             var queryType = $('input[name=input-type]:checked').val();
-            batchJob(genesList, queryType);
+            upstreamJob(genesList, queryType);
+        }
+    },       
+    /**
+    * API to run batch command for downstream
+    */
+    runBatchDown: function() {
+        console.log("down");
+        var genesList = $('#geneListDown').val().replace(/\s/g, '');
+        if (genesList !== "") {
+            document.getElementById("noResult").style.display = 'none';
+            var queryType = $('input[name=input-type]:checked').val();
+            downstreamJob(genesList, queryType);
+        }else {
+            document.getElementById("noResult").style.display = 'block';
         }
     }
 });

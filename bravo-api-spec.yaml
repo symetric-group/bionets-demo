@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: '2.2.1'
 info:
   title: BRAvo API
   description: API description in **Markdown**.
@@ -20,14 +20,50 @@ paths:
           items:
             type: string
             format: json
+            uniqueItems: true
             enum:
               - '[MYC,GALT]'
               - '[ENSG00000158669,HGNC:4135,ENSG00000116133]'
-          description: A person's name.
+          description: List of biological entities (target)
         - in: formData
           name: type
           type: string
           required: true
+          enum:
+            - id
+            - name
+          description: Define the type of entities
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      responses:
+        '200':
+          description: "OK"
+        '500':
+          description: "Error while processing automatic upstream network assembly"
+  /automatic/downstream:
+    post:
+      summary: Run downstream assembly
+      description: Returns a downstream regulation graph based on a list of source genes.
+      parameters:
+        - in: formData
+          name: genes
+          type: array
+          required: true
+          items:
+            type: string
+            format: json
+            uniqueItems: true
+            enum:
+              - '[MYC,GALT]'
+              - '[ENSG00000158669,HGNC:4135,ENSG00000116133]'
+          description: List of biological entities (source)
+        - in: formData
+          name: type
+          type: string
+          required: true
+          description: Define the type of entities
           enum:
             - id
             - name
@@ -37,15 +73,6 @@ paths:
         - application/x-www-form-urlencoded
       responses:
         '200':
-          description: OK
-  /automatic/downstream:
-    post:
-      summary: Run downstream assembly
-      description: Returns a downstream regulation graph based on a list of source genes.
-      produces:
-        - application/json
-      consumes:
-        - application/json
-      responses:
-        '200':
-          description: OK
+          description: "OK"
+        '500':
+          description: "Error while processing automatic upstream network assembly"
