@@ -28,7 +28,6 @@ var WelcomeView = Backbone.View.extend({
         return this;
     }
 });
-
 var myWelcomeView = new WelcomeView();
 
 
@@ -39,6 +38,13 @@ $(document).ready(function () {
         }
     });
     myWelcomeView.render(); 
+    
+    $('#api-doc').click(function () {
+//        $.get("templates/api-doc.html", function(data, textStatus, XMLHttpRequest){
+//            console.log(data);
+//        });
+        $("#mainContainer").load("templates/api-doc.html"); 
+    });
 
 });
 
