@@ -1,4 +1,4 @@
-# BRAvo : Biological netwoRk Assembly
+# BRAvo : Biological netwoRk Assembly ![](https://travis-ci.org/symetric-group/bionets-demo.svg?branch=master)
 
 ## Synopsis
 BRAvo is a web interface that aims to assemble regulatory networks. It is available at http://vm0131.france-bioinformatique.fr/
