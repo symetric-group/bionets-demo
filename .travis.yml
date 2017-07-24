@@ -5,6 +5,6 @@ notifications:
   email:
     recipients:
       - alban.gaignard@univ-nantes.fr
-      - marie.lefevre@univ-nantes.fr
+      - marie.lefebvre@univ-nantes.fr
 #    on_success: never # default: change
 #    on_failure: always # default: always
