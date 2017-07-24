@@ -125,7 +125,7 @@ public class Systemic {
             final StringWriter writer = new StringWriter(); 
             finalModel.write(writer, "RDF/JSON");
             return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(writer.toString()).build(); 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             logger.error(ex);
             return Response.status(500).header(headerAccept, "*").entity("Error while querying PathwayCommons endpoint").build();
         }
