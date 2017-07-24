@@ -64,7 +64,7 @@ public class Systemic {
         // Use of IDs 
         if ("id".equals(queryType)) {
             JSONArray idList = genesList;
-            genesList = IdToNameQuery(idList);
+            genesList = IdToNameQuery(idL
         }
         try {
             for(int i=0; i < genesList.length(); i++){
