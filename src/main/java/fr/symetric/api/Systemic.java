@@ -16,9 +16,7 @@ import java.net.URI;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -150,7 +148,7 @@ public class Systemic {
                 "WHERE{\n" +
                 "  ?a bp:id ?b .\n" +
                 "  FILTER ( ?b = '"+idList.get(i).toString().toUpperCase()+"'^^xsd:string )\n" +
-                "  ?c ?d ?a .\n" +
+                "  ?c bp:xref ?a .\n" +
                 "  ?e ?f ?c .\n" +
                 "  ?e bp:displayName ?name .\n" +
                 "}\n";
