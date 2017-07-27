@@ -90,7 +90,7 @@ function graphLayout(cy, genesList, initial=false) {
                 }
             }
             if(  element.isNode() && initial === false ){
-                if ( element.data("id")===  genesList[gene]) {
+                if ( element.data("id") ===  genesList[gene]) {
                     element.addClass('class-second-input');
                 }
             }

@@ -89,6 +89,7 @@ function nextLevelRegulation(genesList, cy) {
     var genesJSON = JSON.stringify(genesList);
     console.log("send", genesList);
     // Show 'query on run' message
+    document.getElementById("noResult").style.display = 'none';
     document.getElementById("sendingQuery").style.display = 'block';
     
     $.ajax({
@@ -113,7 +114,6 @@ function nextLevelRegulation(genesList, cy) {
             checkboxContent(toUniq, "regulation");
             if ( isEmpty(items) === true ){
                 document.getElementById("noResult").style.display = 'block';
-                document.getElementById("next-level-regulation").style.display = 'none';
             }
             // Listen to checkbox option 'All'
             document.getElementById('toggle').addEventListener("click", function checklist() {

@@ -31,7 +31,12 @@ var DemoSysbioView = Backbone.View.extend({
         console.log("querySearchNetworkEvt");
         var queryType = $('input[name=query-type]:checked').val();
         // Initialize graphe visualization
-        var cy = initialCy();
+        if(typeof cy === 'undefined'){
+            cy = initialCy();
+        }else {
+            cy = null;
+            cy = initialCy();
+        }
         var genesList = $('#inputGeneList').val().replace(/\s/g, '');
         if (genesList !== "") {
             /** 

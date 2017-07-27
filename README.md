@@ -9,7 +9,9 @@ Huge efforts address the organization of biological knowledge through linked ope
 **With BRAvo, we propose a framework based on Semantic Web technologies. It addresses _(i)_ the uniform identification of multi-source biological entities, _(ii)_ the description of labeled directed graphs through RDF, and _(iii)_ the use of [BioPAX](http://www.biopax.org/) as a semantic reference.**
 
 ## Requirements
-TODO
+- git
+- maven
+- java8
 
 ## Installation
 Clone the repository
