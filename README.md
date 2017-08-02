@@ -24,7 +24,7 @@ Build package with maven :
     
 Run the web appliation 
 
-    java -jar target/linked-bionet-1.0-SNAPSHOT-datahub-launcher.jar
+    java -jar target/BRAvo-1.0-SNAPSHOT-bin.jar
    
 See on http://localhost:8091/
 
