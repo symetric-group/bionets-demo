@@ -170,18 +170,22 @@ public class Automatic {
                 geneDone.add(gene);
                 // SPARQL Query to get all transcription factors for a gene
                 String queryString = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-                            +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                            +"CONSTRUCT {\n"
-                            +"?tempReac bp:controlType ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source .\n"
-                            +"} WHERE{ \n"
-                            + "FILTER( (?controlledName = 'Transcription of "+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?controllerName != '"+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?source != 'mirtarbase'^^<http://www.w3.org/2001/XMLSchema#string>) ) .\n"
-                            +"?tempReac a bp:TemplateReactionRegulation .\n"
-                            +"?tempReac bp:displayName ?reacName ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source .\n"
-                            +"?controlled bp:displayName ?controlledName .\n"
-                            +"?controller bp:displayName ?controllerName .\n "
-                            +"}";
+                        +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+                        +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n"
+                        +"CONSTRUCT {\n"
+                        +"  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n"
+                        +"  ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n"
+                        +"  ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource ."
+                        +"} WHERE{ \n"
+                        + "FILTER( (?controlledName = '"+gene+"'^^xsd:string) "
+                            + "and (?controllerName != '"+gene+"'^^xsd:string)"
+                            + "and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n"
+                        +"?tempReac a bp:TemplateReactionRegulation .\n"
+                        +"?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n"
+                        +"?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n"
+                        +"?participant bp:displayName ?controlledName; rdf:type ?controlledType ."
+                        +"?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n "
+                        +"}";
                             //+"GROUP BY ?controlledName ?controllerName";
                 String contentType = "application/json";
                 // URI of the SPARQL Endpoint
@@ -327,19 +331,22 @@ public class Automatic {
                 genesDone.add(TF);
                 // SPARQL Query to get all transcription factors for a gene
                 String queryStringC = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-                    +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                    +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-                    +"CONSTRUCT {\n"
-                        +"?tempReac bp:controlType ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source .\n"
-                    +"}"
-                    + "WHERE{\n"
-                      + "FILTER( (?controlledName = 'Transcription of "+TF+"'^^xsd:string)"
-                            + "&& (?source != 'mirtarbase'^^xsd:string) ) .\n"
-                      +"?tempReac a bp:TemplateReactionRegulation .\n"
-                      +"?tempReac bp:displayName ?reacName ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source .\n"
-                      +"OPTIONAL { ?controlled bp:displayName ?controlledName . }\n"
-                      +"?controller bp:displayName ?controllerName .\n "
-                    +"}";
+                        +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+                        +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n"
+                        +"CONSTRUCT {\n"
+                        +"  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n"
+                        +"  ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n"
+                        +"  ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource ."
+                        +"} WHERE{ \n"
+                        + "FILTER( (?controlledName = '"+TF+"'^^xsd:string) "
+                            + "and (?controllerName != '"+TF+"'^^xsd:string)"
+                            + "and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n"
+                        +"?tempReac a bp:TemplateReactionRegulation .\n"
+                        +"?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n"
+                        +"?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n"
+                        +"?participant bp:displayName ?controlledName; rdf:type ?controlledType ."
+                        +"?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n "
+                        +"}";
                 String contentType = "application/json";
                 // URI of the SPARQL Endpoint
                 String accessUri = "http://rdf.pathwaycommons.org/sparql";
