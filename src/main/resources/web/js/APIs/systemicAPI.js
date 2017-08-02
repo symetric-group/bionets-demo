@@ -161,27 +161,6 @@ function upstreamJob(genesList, queryType) {
                 document.getElementById("auto-noResult").style.display = 'block';
             }else{
                 document.getElementById('panel-download-success').style.display = 'block';
-                document.getElementById('btn-download-csv').addEventListener("click", function exportAsCSV() {
-                    var arrData = JSON.parse(results["json"]);
-                    var csv = "origin,target,type,source";
-                    for (var object in arrData) {
-                        var row = "";
-                        //2nd loop will extract each column and convert it in string comma-seprated
-                        for (var index in arrData[object]) {
-                            
-                            row += '"' + arrData[object][index][0]["value"] + '",';
-                        }
-                        row.slice(0, row.length - 1);
-                        //add a line break after each row
-                        csv += row + '\r\n';
-                    }
-                    //Initialize file format you want csv or xls
-                    var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
-                    var link = document.getElementById("d");
-                    link.href = uri;
-                    link.download = "graph.csv";
-                    link.click();
-                });
                 document.getElementById('btn-download-json').addEventListener("click", function exportAsJSON() {
                     var JSON = features.replace('\\','').replace('\n','');
                     var c = document.getElementById('c');
