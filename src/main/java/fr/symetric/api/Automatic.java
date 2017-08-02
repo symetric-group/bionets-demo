@@ -23,6 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilderException;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -312,8 +313,11 @@ public class Automatic {
         // SPARQL Query to get controller of a model (e.g. gene)
         String queryStringS = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n" +
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "SELECT DISTINCT ?controller\n" +
-            "WHERE{ ?x bp:controller ?controller }" ;
+            "SELECT DISTINCT ?name\n" +
+            "WHERE{ " +
+                "?x bp:controller ?controller .\n" +
+                "?controller bp:displayName ?name" +
+            " }" ;
         Model resultTemp = ModelFactory.createDefaultModel();
         // Create query
         Query queryS = QueryFactory.create(queryStringS) ;
@@ -321,57 +325,58 @@ public class Automatic {
         // Execute select
         ResultSet TFs = qex.execSelect();
         try {
-        // For each regulators
-        for ( ; TFs.hasNext() ; ){
-            QuerySolution soln = TFs.nextSolution() ;
-            StringBuilder result = new StringBuilder();
-            RDFNode TF = soln.get("controller") ;       // Get a result variable by name (e.g. gene)
-            // Research not done yet
-            if( !genesDone.contains(TF) ){
-                genesDone.add(TF);
-                // SPARQL Query to get all transcription factors for a gene
-                String queryStringC = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-                        +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                        +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n"
-                        +"CONSTRUCT {\n"
-                        +"  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n"
-                        +"  ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n"
-                        +"  ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource ."
-                        +"} WHERE{ \n"
-                        + "FILTER( (?controlledName = '"+TF+"'^^xsd:string) "
-                            + "and (?controllerName != '"+TF+"'^^xsd:string)"
-                            + "and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n"
-                        +"?tempReac a bp:TemplateReactionRegulation .\n"
-                        +"?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n"
-                        +"?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n"
-                        +"?participant bp:displayName ?controlledName; rdf:type ?controlledType ."
-                        +"?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n "
-                        +"}";
-                String contentType = "application/json";
-                // URI of the SPARQL Endpoint
-                String accessUri = "http://rdf.pathwaycommons.org/sparql";
+            // For each regulators
+            for ( ; TFs.hasNext() ; ){
+                QuerySolution soln = TFs.nextSolution() ;
+                StringBuilder result = new StringBuilder();
+                RDFNode TF = soln.get("name") ;       // Get a result variable by name (e.g. gene)
+                // Research not done yet
+                if( !genesDone.contains(TF) ){
+                    genesDone.add(TF);
+                    // SPARQL Query to get all transcription factors for a gene
+                    // An error will be sent if TF contains an apostrophe 
+                    String queryStringC = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
+                            +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+                            +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n"
+                            +"CONSTRUCT {\n"
+                            +"  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n"
+                            +"  ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n"
+                            +"  ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource ."
+                            +"} WHERE{ \n"
+                            + "FILTER( (?controlledName = "+TF+"'^^xsd:string) "
+                                + "and (?controllerName != '"+TF+"'^^xsd:string)"
+                                + "and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n"
+                            +"?tempReac a bp:TemplateReactionRegulation .\n"
+                            +"?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n"
+                            +"?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n"
+                            +"?participant bp:displayName ?controlledName; rdf:type ?controlledType ."
+                            +"?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n "
+                            +"}";
+                    String contentType = "application/json";
+                    // URI of the SPARQL Endpoint
+                    String accessUri = "http://rdf.pathwaycommons.org/sparql";
 
-                URI requestURI = javax.ws.rs.core.UriBuilder.fromUri(accessUri)
-                           .queryParam("query", "{query}")
-                           .queryParam("format", "{format}")
-                           .build(queryStringC, contentType);
-                URLConnection con = requestURI.toURL().openConnection();
-                con.addRequestProperty("Accept", contentType);
-                InputStream in = con.getInputStream();
+                    URI requestURI = javax.ws.rs.core.UriBuilder.fromUri(accessUri)
+                               .queryParam("query", "{query}")
+                               .queryParam("format", "{format}")
+                               .build(queryStringC, contentType);
+                    URLConnection con = requestURI.toURL().openConnection();
+                    con.addRequestProperty("Accept", contentType);
+                    InputStream in = con.getInputStream();
 
-                // Read result
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    // Read result
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-                String lineResult;
-                while((lineResult = reader.readLine()) != null) {
-                    result.append(lineResult);
+                    String lineResult;
+                    while((lineResult = reader.readLine()) != null) {
+                        result.append(lineResult);
+                    }
+                    // Prepare model
+                    ByteArrayInputStream bais = new ByteArrayInputStream(result.toString().getBytes());
+                    resultTemp.read(bais, null, "RDF/JSON");
                 }
-                // Prepare model
-                ByteArrayInputStream bais = new ByteArrayInputStream(result.toString().getBytes());
-                resultTemp.read(bais, null, "RDF/JSON");
-            }
-        } // End for loop
-        }catch(Exception e){
+            } // End for loop
+        }catch(IOException | IllegalArgumentException | UriBuilderException e){
             System.err.println(e.getMessage());
         }
         //qex.close(); // Close select query execution
