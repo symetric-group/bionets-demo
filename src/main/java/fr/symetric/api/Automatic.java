@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 
 
 /**
@@ -147,7 +148,7 @@ public class Automatic {
             }
             System.out.println("Results will be send");
             return Response.status(200).header("Access-Control-Allow-Origin", "*").entity(scopes).build(); 
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             logger.error(ex);
             return Response.status(500).header(headerAccept, "*").entity("Error while processing automatic network assembly "+ex).build();
         }
@@ -235,19 +236,23 @@ public class Automatic {
                 String gene = genes.get(i).toString().toUpperCase();
                 geneDone.add(gene);
                 // SPARQL Query to get all transcription factors for a gene
-                String queryString = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-                            +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                            +"CONSTRUCT {\n"
-                            +"?tempReac bp:controlType ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source .\n"
-                            +"} WHERE{ \n"
-                            + "FILTER( (?controlledName != 'Transcription of "+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?controllerName = '"+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?source != 'mirtarbase'^^<http://www.w3.org/2001/XMLSchema#string>) ) .\n"
-                            +"?tempReac a bp:TemplateReactionRegulation .\n"
-                            +"?tempReac bp:displayName ?reacName ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source .\n"
-                            +"?controlled bp:displayName ?controlledName .\n"
-                            +"?controller bp:displayName ?controllerName .\n "
-                            +"}";
+                String queryString = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n" +
+                    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"+
+                    "CONSTRUCT {\n" +
+                    "    ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n" +
+                    "    ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n" +
+                    "    ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource .\n" +
+                    "}WHERE{\n" +
+                    "  FILTER( (?controlledName != '"+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>)\n" +
+                    "       and (?controllerName = '"+gene+"'^^<http://www.w3.org/2001/XMLSchema#string>)\n" +
+                    "       and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n" +
+                    "  ?tempReac a bp:TemplateReactionRegulation .\n" +
+                    "  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n" +
+                    "  ?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n" +
+                    "  ?participant bp:displayName ?controlledName; rdf:type ?controlledType .\n" +
+                    "  ?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n" +
+                    "}";
                             //+"GROUP BY ?controlledName ?controllerName";
                 String contentType = "application/json";
                 // URI of the SPARQL Endpoint
@@ -343,7 +348,7 @@ public class Automatic {
                             +"  ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n"
                             +"  ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource ."
                             +"} WHERE{ \n"
-                            + "FILTER( (?controlledName = "+TF+"'^^xsd:string) "
+                            + "FILTER( (?controlledName = '"+TF+"'^^xsd:string) "
                                 + "and (?controllerName != '"+TF+"'^^xsd:string)"
                                 + "and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n"
                             +"?tempReac a bp:TemplateReactionRegulation .\n"
@@ -401,8 +406,10 @@ public class Automatic {
         // SPARQL Query to get controller of a model (e.g. gene)
         String queryStringS = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n" +
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "SELECT DISTINCT ?controlled\n" +
-            "WHERE{ ?x bp:controlled ?controlled }" ;
+            "SELECT DISTINCT ?name\n" +
+            "WHERE{ ?x bp:controlled ?controlled ."
+                + "?controlled bp:displayName ?name ."
+                + " }" ;
         Model resultTemp = ModelFactory.createDefaultModel();
         // Create query
         Query queryS = QueryFactory.create(queryStringS) ;
@@ -414,27 +421,29 @@ public class Automatic {
         for ( ; TFs.hasNext() ; ){
             QuerySolution soln = TFs.nextSolution() ;
             StringBuilder result = new StringBuilder();
-            RDFNode TF = soln.get("controlled") ;       // Get a result variable by name (e.g. gene)
-            String source = TF.toString().replace("Transcription of ", "");
+            RDFNode TF = soln.get("name") ;       // Get a result variable by name (e.g. gene)
+            String source = TF.toString();
             // Research not done yet
             if( !genesDone.contains(source) ){
                 genesDone.add(source);
                 // SPARQL Query to get all transcription factors for a gene
-                String queryStringC = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n"
-                    +"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                    +"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-                    +"CONSTRUCT {\n"
-                        +"?tempReac bp:controlType ?type ; bp:controlled ?controlledName ; bp:controller ?controllerName ; bp:dataSource ?source .\n"
-                    +"}"
-                    + "WHERE{\n"
-                      + "FILTER( (?controlledName != 'Transcription of "+source+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?controllerName = '"+source+"'^^<http://www.w3.org/2001/XMLSchema#string>) "
-                                + "and (?source != 'mirtarbase'^^<http://www.w3.org/2001/XMLSchema#string>) ) .\n"
-                      +"?tempReac a bp:TemplateReactionRegulation .\n"
-                      +"?tempReac bp:displayName ?reacName ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?type ; bp:dataSource ?source .\n"
-                      +"OPTIONAL { ?controlled bp:displayName ?controlledName . }\n"
-                      +"?controller bp:displayName ?controllerName .\n "
-                    +"}";
+                String queryStringC = "PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n" +
+                    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"+
+                    "CONSTRUCT {\n" +
+                    "    ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:dataSource ?source ; bp:controlType ?controlType .\n" +
+                    "    ?controlled a ?controlledType ; bp:displayName ?controlledName ; bp:dataSource ?controlledsource .\n" +
+                    "    ?controller a ?controllerType ; bp:displayName ?controllerName ; bp:dataSource ?controllersource .\n" +
+                    "}WHERE{\n" +
+                    "  FILTER( (?controlledName != '"+TF+"'^^xsd:string)\n" +
+                    "       and (?controllerName = '"+source+"'^^<http://www.w3.org/2001/XMLSchema#string>)\n" +
+                    "       and (str(?source) != 'http://pathwaycommons.org/pc2/mirtarbase') ) .\n" +
+                    "  ?tempReac a bp:TemplateReactionRegulation .\n" +
+                    "  ?tempReac rdf:type ?type ; bp:controlled ?controlled ; bp:controller ?controller ; bp:controlType ?controlType ; bp:dataSource ?source .\n" +
+                    "  ?controlled bp:participant ?participant ; bp:dataSource ?controlledsource .\n" +
+                    "  ?participant bp:displayName ?controlledName; rdf:type ?controlledType .\n" +
+                    "  ?controller bp:displayName ?controllerName ; rdf:type ?controllerType ; bp:dataSource ?controllersource .\n" +
+                    "}";
                 String contentType = "application/json";
                 // URI of the SPARQL Endpoint
                 String accessUri = "http://rdf.pathwaycommons.org/sparql";
@@ -459,7 +468,7 @@ public class Automatic {
                 resultTemp.read(bais, null, "RDF/JSON");
             }
         } // End for loop
-        }catch(Exception e){
+        }catch(IOException | IllegalArgumentException | UriBuilderException e){
             System.err.println(e.getMessage());
         }
         //qex.close(); // Close select query execution
