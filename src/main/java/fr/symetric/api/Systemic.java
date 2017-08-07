@@ -150,7 +150,7 @@ public class Systemic {
                 "WHERE{\n" +
                 "  ?a bp:id ?b .\n" +
                 "  FILTER ( ?b = '"+idList.get(i).toString().toUpperCase()+"'^^xsd:string )\n" +
-                "  ?c bp:xref ?a .\n" +
+                "  ?c ?d ?a .\n" +
                 "  ?e ?f ?c .\n" +
                 "  ?e bp:displayName ?name .\n" +
                 "}\n";
